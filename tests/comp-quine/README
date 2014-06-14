@@ -1,0 +1,5 @@
+quine.pgp is a compressed packet that uncompresses to itself, taken
+from Taylor Campbell's post in http://mumble.net/~campbell/blag.txt
+
+The expected result is that your implementation skip this packet
+entirely.

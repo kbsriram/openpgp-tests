@@ -1,0 +1,8 @@
+invalid-signing-subkey.pkr is a public key with two signing subkeys,
+but one has a missing embedded signature while the other has an an
+invalid embedded signature.
+
+Your implementation must reject signatures created by either
+subkey. subkey1-signed.asc and subkey2-signed.asc are two sample
+messages signed by these subkeys. Make sure your implementation
+rejects both signatures.

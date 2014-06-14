@@ -1,0 +1,8 @@
+revoked-subkey.pkr has two encryption subkeys. Both encryption subkeys
+have been revoked, and your implementation must detect and not use any
+of them (and therefore, must not encrypt any messages for this
+recipient.)
+
+One of the subkeys has a signature that is newer than the revoked
+signature. Revocations are permanent, and cannot be undone by newer
+signatures, so you must still not use this subkey.

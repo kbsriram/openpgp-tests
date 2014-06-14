@@ -1,0 +1,10 @@
+This tests whether your implementation correctly handles designated
+revokers.
+
+1. import revoker.pkr -- it will used in the next two steps.
+
+2. import must_not_revoke_target.pkr -- this public key should be
+   available for use.
+
+3. import must_revoke_target.pkr -- this public key should now be
+   revoked (by revoker.pkr)

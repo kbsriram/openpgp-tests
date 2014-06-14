@@ -1,0 +1,3 @@
+unsigned-subkey.pkr is a public key with an unsigned encryption
+subkey. The unsigned subkey must be discarded, and as a consequence
+your implementation should not encrypt messages for this recipient.

@@ -1,0 +1,3 @@
+unsigned-uid.pkr is a public key with two uids, but one is missing a
+self-signature. Your implementation should discard the uid that is
+missing a self-signature.

@@ -1,0 +1,2 @@
+pk-revoked-uid.pkr is a public key with two uids, but one has been
+revoked. Your implementation should not use the revoked uid.

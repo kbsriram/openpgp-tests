@@ -1,0 +1,3 @@
+expired-subkey.pkr is a public key with an encryption subkey, but the
+subkey's signature has expired. As there are no other encryption keys,
+your implementation must not encrypt messages for this recipient.

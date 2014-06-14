@@ -1,0 +1,3 @@
+expired-uid.pkr is a public key with two uids, but one has an expired
+signature. Your implementation must not use the uid with the expired
+self-signature.

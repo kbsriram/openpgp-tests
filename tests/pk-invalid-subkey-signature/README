@@ -1,0 +1,14 @@
+invalid-signed-subkey.pkr is a public key with two subkeys. One is a
+certification subkey, and one is an encryption subkey.
+
+You should accept the certification subkey (signed by the primary
+key), but not the encryption subkey (signed by the certification
+subkey.)
+
+You might expect that because there's a valid chain of signatures to
+the primary key, the encryption subkey should be accepted. However,
+binding signatures and userid signatures must be made by the
+primary key.
+
+Of course, as a consequence you must not be able to encrypt messages
+for this recipient.

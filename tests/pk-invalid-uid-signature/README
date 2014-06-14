@@ -1,0 +1,3 @@
+invalid-signed-uid.pkr is a public key with two uids, but one has an
+invalid signature. Your implementation must discard the uid that has a
+bad self-signature.
