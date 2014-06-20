@@ -1,1 +1,4 @@
 *~
+example/java/classes/
+example/java/tests/reports/
+example/java/tests/src/com/kbsriram/openpgp/CSanityCheckTest.java

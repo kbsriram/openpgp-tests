@@ -1,0 +1,7 @@
+This test checks that certifications (related to OpenPGP's web of
+trust) are correctly handled.  First read a-certifier.pkr and
+b-certifier.pkr. Then import target.pkr, which contains two userids.
+
+You should detect a-certifier as having revoked one of the userids,
+and having a bad signature on the other. b-certifier should only
+certify one of the userids.

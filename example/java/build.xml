@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="pgptests" basedir=".">
+
+  <property name="java.source" value="1.5"/>
+  <property name="java.target" value="1.5"/>
+  <property name="lib.dir" value="${basedir}/lib"/>
+  <property name="classes.dir" value="classes"/>
+  <property name="src.dir" value="src"/>
+  <property name="tests.dir" value="tests"/>
+  <property name="reports.dir" value="${tests.dir}/reports"/>
+
+  <path id="bc.lib">
+    <pathelement path="${lib.dir}/bcprov-jdk15on-150.jar"/>
+    <pathelement path="${lib.dir}/bcpg-jdk15on-150.jar"/>
+  </path>
+
+  <target name="init">
+    <mkdir dir="${reports.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac source="${java.source}"
+           target="${java.target}"
+           debug="true"
+           srcdir="${src.dir}"
+           includeantruntime="false"
+           destdir="${classes.dir}">
+      <compilerarg value="-Xlint:all"/>
+      <classpath>
+        <path refid="bc.lib"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="test-compile" depends="compile">
+    <javac source="${java.source}"
+           target="${java.target}"
+           debug="true"
+           srcdir="${tests.dir}/src"
+           includeantruntime="false"
+           destdir="${classes.dir}">
+      <compilerarg value="-Xlint:all"/>
+      <classpath>
+        <path refid="bc.lib"/>
+        <pathelement location="${lib.dir}/junit-4.10.jar"/>
+        <pathelement location="${classes.dir}"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="test" depends="test-compile">
+    <junit printsummary="yes" haltonfailure="yes">
+      <classpath>
+        <path refid="bc.lib"/>
+        <pathelement location="${lib.dir}/junit-4.10.jar"/>
+        <pathelement location="${classes.dir}"/>
+      </classpath>
+      <formatter type="plain"/>
+      <batchtest todir="${reports.dir}">
+        <fileset dir="${tests.dir}/src">
+          <include name="**/C*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="clean">
+    <delete dir="${classes.dir}"/>
+    <delete dir="${reports.dir}"/>
+  </target>
+
+</project>

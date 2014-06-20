@@ -1,0 +1,10 @@
+misused-subkey.pkr contains a primary key and an encryption
+subkey.
+
+hello.txt.sig is a detached signature that provides a signature for
+the file hello.txt, but is signed with the encryption subkey rather
+than a signing key. Implementations should reject the signature.
+
+By contrast, hello-good.txt.sig is a good signature for hello.txt
+(signed by the primary key which is also flagged as usable for
+signing.)
