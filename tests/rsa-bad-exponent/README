@@ -1,0 +1,5 @@
+rsa-bad-exponent.pkr contains RSA keys with an exponent == 1, which
+should be rejected.
+
+http://csrc.nist.gov/publications/nistpubs/800-89/SP-800-89_November2006.pdf
+has additional useful recommendations.

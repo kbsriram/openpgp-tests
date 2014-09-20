@@ -1,20 +1,23 @@
 package com.kbsriram.openpgp;
 
-import org.bouncycastle.util.encoders.Hex;
-import java.util.Map;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.bouncycastle.bcpg.BCPGKey;
+import org.bouncycastle.bcpg.DSAPublicBCPGKey;
 import org.bouncycastle.bcpg.PacketTags;
+import org.bouncycastle.bcpg.RSAPublicBCPGKey;
 import org.bouncycastle.bcpg.SignatureSubpacket;
 import org.bouncycastle.bcpg.SignatureSubpacketTags;
 import org.bouncycastle.bcpg.sig.IssuerKeyID;
@@ -32,6 +35,7 @@ import org.bouncycastle.openpgp.PGPSignatureList;
 import org.bouncycastle.openpgp.PGPSignatureSubpacketVector;
 import org.bouncycastle.openpgp.PGPUserAttributeSubpacketVector;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentVerifierBuilderProvider;
+import org.bouncycastle.util.encoders.Hex;
 
 public class CPGPUtils
 {
@@ -315,6 +319,8 @@ public class CPGPUtils
                 ("Unexpected - first key is not master");
         }
 
+        checkWeakKey(masterpk);
+
         StringBuilder errors = new StringBuilder();
 
         List<byte[]> designated_revoker_fps = new ArrayList<byte[]>();
@@ -393,6 +399,15 @@ public class CPGPUtils
 
         while (keysit.hasNext()) {
             PGPPublicKey subkey = keysit.next();
+            // Avoid accepting weak keys.
+            try { checkWeakKey(subkey); }
+            catch (PGPException pge) {
+                errors.append
+                    ("Rejecting subkey "+nicePk(subkey)+
+                     " because it is a weak key. ("+
+                     pge.getMessage()+")");
+                continue;
+            }
             if (subkey.isMasterKey()) {
                 throw new IllegalArgumentException("unexpected");
             }
@@ -405,6 +420,70 @@ public class CPGPUtils
              prim_revoking_sigs,
              userids, userattrs, subkeys, einfo.getKey(),
              errors);
+    }
+
+    private final static void checkWeakKey(PGPPublicKey pk)
+        throws PGPException
+    {
+        BCPGKey k = pk.getPublicKeyPacket().getKey();
+        if (k instanceof RSAPublicBCPGKey) {
+            checkWeakRSA((RSAPublicBCPGKey) k);
+        }
+        else if (k instanceof DSAPublicBCPGKey) {
+            checkDSA((DSAPublicBCPGKey) k);
+        }
+        // tbd
+    }
+
+    private final static void checkDSA(DSAPublicBCPGKey dsak)
+        throws PGPException
+    {
+        BigInteger y = dsak.getY();
+        BigInteger p = dsak.getP();
+
+        // 2 <= y <= p-2
+        BigInteger psub2 = p.subtract(TWO);
+        if (y.compareTo(TWO) < 0) {
+            throw new PGPException("DSA parameter y must be >= 2");
+        }
+        if (y.compareTo(psub2) > 0) {
+            throw new PGPException("DSA parameter y must be <= p-2");
+        }
+
+        BigInteger q = dsak.getQ();
+        // y^q = 1 mod p
+        if (!BigInteger.ONE.equals(y.modPow(q, p))) {
+            throw new PGPException("DSA parameter check - y^q != 1 mod p");
+        }
+    }
+
+    private final static void checkWeakRSA(RSAPublicBCPGKey rsak)
+        throws PGPException
+    {
+        BigInteger n = rsak.getModulus();
+        BigInteger e = rsak.getPublicExponent();
+
+        // n and e should be odd.
+        if (!n.testBit(0) || !e.testBit(0)) {
+            throw new PGPException("modulus and exponent must not be even.");
+        }
+
+        // e should be > 2
+        if (e.compareTo(TWO) <= 0) {
+            throw new PGPException("exponent must be >= 3");
+        }
+
+        // modulus should fail primality test
+        if (n.isProbablePrime(80)) {
+            throw new PGPException
+                ("modulus doesn't seem to be a composite number.");
+        }
+
+        // modulus should have no small factors
+        BigInteger factor = n.gcd(SMALL_FACTORS);
+        if (!factor.equals(BigInteger.ONE)) {
+            throw new PGPException("modulus has a small factor ("+factor+")");
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1076,4 +1155,7 @@ public class CPGPUtils
 
     // willing to accept timestamps within this interval. (1 minute)
     private final static long ACCEPTABLE_DELTA_MSEC = 60l*1000l;
+    private final static BigInteger TWO = BigInteger.valueOf(2);
+    private final static BigInteger SMALL_FACTORS =
+        new BigInteger("1451887755777639901511587432083070202422614380984889313550570919659315177065956574359078912654149167643992684236991305777574330831666511589145701059710742276692757882915756220901998212975756543223550490431013061082131040808010565293748926901442915057819663730454818359472391642885328171302299245556663073719855");
 }

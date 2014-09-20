@@ -1,0 +1,9 @@
+rsa-small-factor.pkr contains RSA keys with a modulus that has a very
+small factor for the modulus (one factor is 101). Such keys are
+easily broken and should not be accepted.
+
+I've also provided the secret key (rsa-small-factor.skr) if you find
+it useful - passphrase "test"
+
+http://csrc.nist.gov/publications/nistpubs/800-89/SP-800-89_November2006.pdf
+has some useful recommendations.
